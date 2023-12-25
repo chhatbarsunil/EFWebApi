@@ -7,17 +7,18 @@ using EFWebApi.Models;
 
 namespace EFWebApi.Context
 {
-    public partial class TestDbContext : DbContext
+    public partial class EFWebApiDbContext : DbContext
     {
-        public TestDbContext()
+        public EFWebApiDbContext()
         {
         }
 
-        public TestDbContext(DbContextOptions<TestDbContext> options)
+        public EFWebApiDbContext(DbContextOptions<EFWebApiDbContext> options)
             : base(options)
         {
         }
 
+        public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<User> Users { get; set; }
@@ -27,12 +28,26 @@ namespace EFWebApi.Context
             if (!optionsBuilder.IsConfigured)
             {
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySQL("Server=127.0.0.1;User ID=root;Database=test");
+                optionsBuilder.UseMySQL("Server=127.0.0.1;User ID=root;Database=efwebapidb");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Efmigrationshistory>(entity =>
+            {
+                entity.HasKey(e => e.MigrationId)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("__efmigrationshistory");
+
+                entity.Property(e => e.MigrationId).HasMaxLength(150);
+
+                entity.Property(e => e.ProductVersion)
+                    .IsRequired()
+                    .HasMaxLength(32);
+            });
+
             modelBuilder.Entity<Employee>(entity =>
             {
                 entity.HasKey(e => e.EmpId)
@@ -104,7 +119,7 @@ namespace EFWebApi.Context
                     .IsRequired()
                     .HasMaxLength(10)
                     .HasColumnName("item_price_currency")
-                    .HasDefaultValueSql("'''usd'''");
+                    .HasDefaultValueSql("'''''''usd'''''''");
 
                 entity.Property(e => e.Modified).HasColumnName("modified");
 
@@ -145,27 +160,27 @@ namespace EFWebApi.Context
                 entity.Property(e => e.Address)
                     .HasMaxLength(50)
                     .HasColumnName("address")
-                    .HasDefaultValueSql("'NULL'");
+                    .HasDefaultValueSql("'''NULL'''");
 
                 entity.Property(e => e.Firstname)
                     .HasMaxLength(50)
                     .HasColumnName("firstname")
-                    .HasDefaultValueSql("'NULL'");
+                    .HasDefaultValueSql("'''NULL'''");
 
                 entity.Property(e => e.Lastname)
                     .HasMaxLength(50)
                     .HasColumnName("lastname")
-                    .HasDefaultValueSql("'NULL'");
+                    .HasDefaultValueSql("'''NULL'''");
 
                 entity.Property(e => e.Password)
                     .HasMaxLength(50)
                     .HasColumnName("password")
-                    .HasDefaultValueSql("'NULL'");
+                    .HasDefaultValueSql("'''NULL'''");
 
                 entity.Property(e => e.Username)
                     .HasMaxLength(50)
                     .HasColumnName("username")
-                    .HasDefaultValueSql("'NULL'");
+                    .HasDefaultValueSql("'''NULL'''");
             });
 
             OnModelCreatingPartial(modelBuilder);
